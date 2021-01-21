@@ -1,15 +1,28 @@
+// Constants
+const input = document.querySelector(".code");
+// Settings
 const autocomplete = [
 	["[", "]"],
 	["(", ")"],
 	[`"`, `"`],
 	["`", "`"],
 	["'", "'"],
+	["{", "}"],
 ];
 const tabSize = 4;
+let updateSpeed = 1000;
+// Variables
 let tabs = 1;
-const input = document.querySelector(".code");
+let updated = true;
+let updateChecker;
+let carousel;
+let codeShown = true;
 
 input.addEventListener("keydown", (e) => {
+   clearTimeout(updateChecker);
+   updateChecker = setTimeout(checkForUpdate, updateSpeed);
+   updated = false;
+   checkForChar(input, 0);
    if (e.key == "Tab") {
       e.preventDefault();
       for (let a = 0; a < tabSize * tabs; a++) {
@@ -57,3 +70,61 @@ function insertAtCursor(myField, myValue, isEnd) {
 		myField.value += myValue;
 	}
 }
+
+function checkForChar(field, position, value) {
+   var pos = field.selectionStart + position;
+   let char = field.value.substring(pos+position-2, pos+position-1);
+   console.log(char);
+}
+
+function checkForUpdate() {
+   if (!updated) {
+      console.log("Updating");
+      carousel = null;
+      let rawSettings = input.value.trim().substring(15, input.value.trim().length - 2);
+      console.log(rawSettings);
+      let settings = JSON.parse(input.value.trim().substring(15, input.value.trim().length - 2));
+      console.log("Settings:");
+      console.log(settings);
+      let destroy = settings.id || ".myCarousel";
+      if (document.querySelector(destroy)) {
+         document.querySelector(destroy).remove();
+      }
+      roundabout.usedIds = [];
+      roundabout.on = -1;
+      carousel = new Roundabout(settings);
+      updated = true;
+   }
+}
+
+updateChecker = setTimeout(checkForUpdate, updateSpeed);
+
+/*
+
+new Roundabout({
+    "pages": [
+        {
+            "background_image": "../images/numbers/0.png"
+        },
+    {
+            "background_image": "../images/numbers/1.png"
+        },
+    {
+            "background_image": "../images/numbers/2.png"
+        }
+    ]
+});
+
+
+
+*/
+
+document.querySelector(".code-toggle").addEventListener("click", () => {
+   if (codeShown) {
+      input.style.display = "none";
+      codeShown = false;
+   } else {
+      input.style.display = "inline-block";
+      codeShown = true;
+   }
+});

@@ -83,11 +83,9 @@ Try to find a way to add "expansions": additional featuresets included in sepera
 
 // To do:
 /*
--  TEST NEW .MIN
--  Per-page HTML & CSS
+-  Overhaul CSS system
 -  Size falloff
 -  Minimal pages support
--  Page size setting
 */
 
 let roundabout = {
@@ -97,8 +95,6 @@ let roundabout = {
 
 class Roundabout {
 	constructor(settings) {
-		// User defined (commented out = not used yet)
-
 		this.pages = settings.pages ? settings.pages : {};
 		this.id = settings.id ? settings.id : ".myCarousel";
       this.type = settings.type ? settings.type : "normal";
@@ -121,7 +117,7 @@ class Roundabout {
 		this.throttle_keys = settings.throttle_keys === false ? settings.throttle_keys : true;
 		this.throttle_swipe = settings.throttle_swipe === false ? settings.throttle_swipe : true;
 		this.throttle_buttons = settings.throttle_buttons === false ? settings.throttle_buttons : true;
-      this.throttle_navigation = settings.throttle_navigation == false ? settings.throttle_navigation : true;
+      this.throttle_navigation = settings.throttle_navigation === false ? settings.throttle_navigation : true;
       
 		this.keys = settings.keys === false ? settings.keys : true;
 		this.swipe = settings.swipe === false ? settings.swipe : true;
@@ -201,13 +197,8 @@ class Roundabout {
    ==================================================================================================================
    */
 
-	/*
-   Ideal flow:
-   1. Check if scrolling is possible. If not, adjust as necessary to do as much as possible.
-   2. Adjust positions.
-   3a. If not values only, give correct classes to corresponding elements.
-   3b. If values only, skip class assignments
-   4. Animate if necessary
+   /*
+   
    flusher:
    const flushCssBuffer = document.querySelector(`.roundabout-${this.uniqueId}-page-${a}`).offsetWidth;
    transition changes:
@@ -788,7 +779,8 @@ class Roundabout {
 
 	// Create each new page from the pages array and append to the parent element
 	generatePages() {
-		let baseHeight = 100;
+      let baseHeight = 100;
+      let pagesCss = "";
 		for (let a = 0; a < this.pages.length; a++) {
 			let newPage = document.createElement("DIV");
 			newPage.classList.add(`roundabout-${this.uniqueId}-page-${a}`, "roundabout-page");
@@ -830,7 +822,13 @@ class Roundabout {
 				//! make changeable
 				newPage.style.backgroundSize = "cover";
 				newPage.style.backgroundPosition = "center center";
-			}
+         }
+         if (this.pages[a].html) {
+            newPage.innerHTML = this.pages[a].html;
+            if (this.pages[a].css) {
+               pagesCss += this.pages[a].css;
+            }
+         }
 			document.querySelector(`.roundabout-${this.uniqueId}-page-wrap`).appendChild(newPage);
 			this.orderedPages.push(a);
 
@@ -840,6 +838,11 @@ class Roundabout {
 				this.positions.push("0px");
 			}
       }
+
+      let newPagesStyle = document.createElement("STYLE");
+      newPagesStyle.setAttribute("type", "text/css");
+      newPagesStyle.innerHTML = pagesCss;
+      document.getElementsByTagName("head")[0].appendChild(newPagesStyle);
       
       // create navigation
 
@@ -986,7 +989,10 @@ class Roundabout {
 				"For the number of pages supplied, there are too many being shown. There must be at least 2 fewer pages shown than the number of pages. Minimum required pages is 3."
 			);
 			return false;
-		}
+      }
+      if (this.pages.length == 0 || !this.pages.length) {
+         this.displayError("No pages have been supplied. Please create a 'pages' array containing your pages. See the documentation for details.");
+      }
 		if (this.id.split("")[0] !== "#" && this.id.split("")[0] !== ".") {
 			this.displayError("An invalid selector prefix was given for the parent. Valid selector prefixes are '#' for IDs or '.' for classes.");
 			return false;
