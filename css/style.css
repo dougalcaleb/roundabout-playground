@@ -2,12 +2,25 @@
 %name - reusable styles (used @extend %name)
 @mixin name - function (used @include name(param))
 $name - variable
-
 */
+.code {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
 * {
   user-select: none;
 }
 
 body {
   margin: 0;
+}
+
+.code {
+  width: 50%;
+  max-height: 20%;
+  bottom: 50px;
+  resize: none;
 }
