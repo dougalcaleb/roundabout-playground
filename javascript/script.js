@@ -39,7 +39,7 @@ input.addEventListener("keydown", (e) => {
       return;
    }
 	autocomplete.forEach((pair) => {
-		if (e.key == pair[0]) {
+		if (e.key == pair[0] && !checkForChar(1)) {
 			e.preventDefault();
 			insertAtCursor(input, pair[0], false);
          insertAtCursor(input, pair[1], true);
@@ -71,10 +71,15 @@ function insertAtCursor(myField, myValue, isEnd) {
 	}
 }
 
-function checkForChar(field, position, value) {
-   var pos = field.selectionStart + position;
-   let char = field.value.substring(pos+position-2, pos+position-1);
-   console.log(char);
+function checkForChar(position, value) {
+   var pos = input.selectionStart + position;
+   let char = input.value.substring(pos+position-2, pos+position-1);
+   if (!value && char.trim() != "") {
+      return true;
+   } else if (value == char) {
+      return true;
+   }
+   return false;
 }
 
 function checkForUpdate() {
@@ -89,6 +94,9 @@ function checkForUpdate() {
       let destroy = settings.id || ".myCarousel";
       if (document.querySelector(destroy)) {
          document.querySelector(destroy).remove();
+      }
+      if (document.querySelector(".carousel-error-message")) {
+         document.querySelector(".carousel-error-message").remove();
       }
       roundabout.usedIds = [];
       roundabout.on = -1;
