@@ -3,7 +3,16 @@
 @mixin name - function (used @include name(param))
 $name - variable
 */
-.code {
+.autocomplete .auto-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.code-editor {
   position: absolute;
   left: 0;
   right: 0;
@@ -19,17 +28,26 @@ body {
 }
 
 .code {
-  width: 75%;
-  height: 75%;
-  bottom: 50px;
+  width: 100%;
+  height: calc(80% - 30px);
   resize: none;
   z-index: 400;
-  border-radius: 5px;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
   background: #232323;
   border: none;
   box-shadow: 0px 0px 10px #333;
   padding: 10px;
+  box-sizing: border-box;
   color: #eee;
+  outline: none;
+}
+
+.code-editor {
+  width: 70%;
+  height: 85%;
+  bottom: 50px;
+  z-index: 99999;
 }
 
 .code-toggle {
@@ -49,4 +67,50 @@ body {
   font-family: monospace;
   cursor: pointer;
   background: #111;
+}
+
+.autocomplete-header {
+  height: 30px;
+  background: #1f1f1f;
+  display: flex;
+}
+.autocomplete-header div {
+  flex: 1;
+  padding-left: 10px;
+  box-sizing: border-box;
+  font-family: monospace;
+  color: white;
+  line-height: 30px;
+}
+
+.autocomplete {
+  background: #121212;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  height: 20%;
+  overflow: auto;
+}
+.autocomplete .auto-hint {
+  text-align: center;
+  height: 50px;
+  line-height: 50px;
+  font-family: monospace;
+  color: #333;
+}
+.autocomplete .auto-row {
+  width: 100%;
+  background: #171717;
+  display: flex;
+  color: #ccc;
+}
+.autocomplete .auto-row div {
+  flex: 1;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  box-sizing: border-box;
+  font-family: monospace;
 }

@@ -14,6 +14,49 @@ const tabPairs = [
 	["{", "}"],
 	["[", "]"],
 ];
+// [name, type, default]
+const autoSettings = [
+	["pages", "array", "[]"],
+	["id", "string", ".myCarousel"],
+	["type", "string", ""],
+	["infinite", "", ""],
+	["parent", "string", "body"],
+	["autoGenCSS", "bool", "true"],
+	["navigation", "bool", "true"],
+	["navigationBehavior", "", ""],
+	["autoscroll", "bool", "false"],
+	["autoscrollSpeed", "integer", "5000"],
+	["autoscrollTimeout", "integer", "15000"],
+	["autoscrollPauseOnHover", "bool", "false"],
+	["autoscrollStartAfter", "integer", "5000"],
+	["autoscrollDirection", "string", "right"],
+	["transition", "integer", "300"],
+	["transitionFunction", "string", "ease"],
+	["throttle", "bool", "true"],
+	["throttleTimeout", "integer", "300"],
+	["throttleMatchTransition", "bool", "true"],
+	["throttleKeys", "bool", "true"],
+	["throttleSwipe", "bool", "true"],
+	["throttleButtons", "bool", "true"],
+	["throttleNavigation", "bool", "true"],
+	["keys", "bool", "true"],
+	["swipe", "bool", "true"],
+	["swipeThreshold", "integer", "300"],
+	["swipeMultiplier", "number", "1"],
+	["swipeResistance", "number", "0.95"],
+	["pagesToShow", "integer", "1"],
+	["--enlargeCenter", "integer", "100"],
+	["--sizeFalloff", "integer", "0"],
+	["pageSpacing", "integer", "0"],
+	["pageSpacingUnits", "string", "px"],
+	["spacingMode", "string", "fill"],
+	["scrollBy", "integer", "1"],
+	["showWrappedPage", "bool", "false"],
+	["mobile", "object", "{swipeThreshold:50}"],
+	["mobileBreakpoint", "integer", "700"],
+	["--visualPreset", "integer", "0"],
+];
+const accepted = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
 const tabSize = 4;
 let updateSpeed = 1000;
 // Variables
@@ -23,6 +66,9 @@ let updateChecker;
 let carousel;
 let codeShown = true;
 let lastWasPair = false;
+let autocompleting = true;
+let typing = "";
+let matcher;
 
 // TODO:
 /*
@@ -36,6 +82,11 @@ input.addEventListener("keydown", (e) => {
 	clearTimeout(updateChecker);
 	updateChecker = setTimeout(checkForUpdate, updateSpeed);
 	updated = false;
+
+	if (autocompleting && accepted.includes(e.key.toString().toLowerCase())) {
+		checkAutocomplete(e.key);
+	}
+
 	checkForChar(input, 0);
 	if (e.key == "Tab") {
 		e.preventDefault();
@@ -47,25 +98,26 @@ input.addEventListener("keydown", (e) => {
 	if (e.key == "Enter") {
 		setTimeout(() => {
 			let pairCorrection = 0;
-         tabPairs.forEach((char) => {
+			tabPairs.forEach((char) => {
 				if (checkForChar(0, char[0])) {
 					pairCorrection = -1;
 					console.log(`Found ${char[0]}. Not tabbing.`);
-            }
-            if (checkForChar(0, char[1])) {
+				}
+				if (checkForChar(0, char[1])) {
 					pairCorrection = -1;
 					console.log(`Found ${char[1]}. Not tabbing.`);
 				}
 			});
-
 			for (let a = 0; a < tabSize * tabs; a++) {
 				insertAtCursor(" ", false);
 			}
+			let result = calcTabs(pairCorrection);
+			console.log(`New tab distance is ${result}`);
+			lastWasPair = false;
 		}, 0);
-
-		calcTabs(pairCorrection);
-		lastWasPair = false;
-		return;
+		// return;
+		autocompleting = true;
+		typing = "";
 	}
 	if (e.key == "Backspace") {
 		if (lastWasPair) {
@@ -73,6 +125,12 @@ input.addEventListener("keydown", (e) => {
 			lastWasPair = false;
 			insertAtCursor("DELETE", false, -1);
 			insertAtCursor("DELETE", true, 0);
+		}
+      if (autocompleting) {
+         if (typing.length > 0) {
+            typing = typing.substr(0, typing.length - 1);
+         }
+         checkAutocomplete("BACKSPACE");
 		}
 	}
 	let wasPair = false;
@@ -160,7 +218,7 @@ function checkForUpdate() {
 	}
 }
 
-function calcTabs(correction) {
+function calcTabs(correction = 0) {
 	let chars = input.value.slice(0, input.selectionStart).split("");
 	let pairs = 0;
 	chars.forEach((codeChar) => {
@@ -174,6 +232,38 @@ function calcTabs(correction) {
 		});
 	});
 	tabs = pairs - 1 + correction;
+	return tabs;
+}
+
+function checkAutocomplete(key) {
+   if (typing.length == 0) {
+      document.querySelector(".auto-hint").style.opacity = "1";
+   }
+   if (key == "BACKSPACE") {
+      typing = typing.substr(0, typing.length - 1);
+   } else {
+      typing += key;
+   }
+	matcher = new RegExp(`${typing}[a-z]*`, "ig");
+	let matches = [];
+	document.querySelector(".autocomplete").innerHTML = null;
+	autoSettings.forEach((setting) => {
+		// console.log(`checking ${setting[0]}`);
+		// console.log(setting);
+		// console.log(matcher);
+		// console.log(setting[0].match(matcher));
+		if (setting[0].match(matcher) && setting[0].substr(0, 2) != "--") {
+			// console.log(`${setting[0]} matches`);
+			matches.push(setting);
+			if (document.querySelector(".auto-hint")) {
+				document.querySelector(".auto-hint").style.opacity = "0";
+			}
+			let autoHint = document.createElement("div");
+			autoHint.classList.add("auto-row");
+			autoHint.innerHTML = `<div>${setting[0]}</div><div>${setting[1]}</div><div>${setting[2]}</div>`;
+			document.querySelector(".autocomplete").appendChild(autoHint);
+		}
+	});
 }
 
 updateChecker = setTimeout(checkForUpdate, updateSpeed);
@@ -200,10 +290,10 @@ new Roundabout({
 
 document.querySelector(".code-toggle").addEventListener("click", () => {
 	if (codeShown) {
-		input.style.display = "none";
+		document.querySelector(".code-editor").style.display = "none";
 		codeShown = false;
 	} else {
-		input.style.display = "inline-block";
+		document.querySelector(".code-editor").style.display = "inline-block";
 		codeShown = true;
 	}
 });
