@@ -56,31 +56,32 @@ const autoSettings = [
 	["mobileBreakpoint", "integer", "700"],
 	["--visualPreset", "integer", "0"],
 ];
-const accepted = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+const accepted = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "_", "-"];
 const tabSize = 4;
 let updateSpeed = 1000;
+let updateMethod = "onclose";
 // Variables
 let tabs = 1;
 let updated = true;
 let updateChecker;
 let carousel;
-let codeShown = true;
 let lastWasPair = false;
 let autocompleting = true;
 let typing = "";
 let matcher;
+let profiles = {};
 
 // TODO:
 /*
--  Autocomplete
-   -  Simple box matching typing
 -  Auto update / update on code close
 -  Parse quotes in
 */
 
 input.addEventListener("keydown", (e) => {
-	clearTimeout(updateChecker);
-	updateChecker = setTimeout(checkForUpdate, updateSpeed);
+   if (updateMethod == "delay") {
+      clearTimeout(updateChecker);
+      updateChecker = setTimeout(checkForUpdate, updateSpeed);
+   }
 	updated = false;
 
 	if (autocompleting && accepted.includes(e.key.toString().toLowerCase())) {
@@ -203,17 +204,28 @@ function checkForUpdate() {
 			document.querySelector(".code-toggle").style.color = "";
 		} catch (e) {
 			document.querySelector(".code-toggle").style.color = "red";
-		}
-		let destroy = settings.id || ".myCarousel";
-		if (document.querySelector(destroy)) {
-			document.querySelector(destroy).remove();
-		}
-		if (document.querySelector(".roundabout-error-message")) {
-			document.querySelector(".roundabout-error-message").remove();
-		}
+      }
+      document.querySelectorAll(".roundabout-wrapper").forEach((roundabout) => {
+         roundabout.remove();
+      });
+      document.querySelectorAll(".roundabout-error-message").forEach((errorMsg) => {
+         errorMsg.remove();
+      });
+		// if (document.querySelector(destroy)) {
+		// 	document.querySelector(destroy).remove();
+		// }
+		// if (document.querySelector(".roundabout-error-message")) {
+		// 	document.querySelector(".roundabout-error-message").remove();
+		// }
 		roundabout.usedIds = [];
-		roundabout.on = -1;
-		carousel = new Roundabout(settings);
+      roundabout.on = -1;
+      console.log("Attempting to render new Roundabout carousel...");
+      try {
+         carousel = new Roundabout(settings);
+         console.log("Render was successful.");
+      } catch (e) {
+         console.error(e);
+      }
 		updated = true;
 	}
 }
@@ -267,32 +279,121 @@ function checkAutocomplete(key) {
 
 updateChecker = setTimeout(checkForUpdate, updateSpeed);
 
-/*
-
-new Roundabout({
-    "pages": [
-        {
-            "background_image": "../images/numbers/0.png"
-        },
-    {
-            "background_image": "../images/numbers/1.png"
-        },
-    {
-            "background_image": "../images/numbers/2.png"
-        }
-    ]
+let codeShown = false;
+let settingsShown = false;
+let infoShown = false;
+document.querySelector(".code-toggle").addEventListener("click", () => {
+   toggleCode();
+   toggleSettings(false);
+   toggleHelp(false);
+});
+document.querySelector(".settings").addEventListener("click", () => {
+   toggleCode(false);
+   toggleSettings();
+   toggleHelp(false);
+});
+document.querySelector(".info").addEventListener("click", () => {
+   toggleCode(false);
+   toggleSettings(false);
+   toggleHelp();
 });
 
-
-
-*/
-
-document.querySelector(".code-toggle").addEventListener("click", () => {
-	if (codeShown) {
-		document.querySelector(".code-editor").style.display = "none";
+function toggleCode(forced) {
+   if (forced != undefined) codeShown = !forced;
+   if (codeShown) {
+      document.querySelector(".code-editor").style.display = "none";
+      if (updateMethod == "onclose") {
+         checkForUpdate();
+      }
 		codeShown = false;
 	} else {
 		document.querySelector(".code-editor").style.display = "inline-block";
 		codeShown = true;
 	}
+}
+function toggleSettings(forced) {
+   if (forced != undefined) settingsShown = !forced;
+   if (settingsShown) {
+		document.querySelector(".settings-modal").style.display = "none";
+		settingsShown = false;
+	} else {
+		document.querySelector(".settings-modal").style.display = "inline-block";
+		settingsShown = true;
+	}
+}
+
+function toggleHelp(forced) {
+   if (forced != undefined) infoShown = !forced;
+   if (infoShown) {
+		document.querySelector(".help-modal").style.display = "none";
+		infoShown = false;
+	} else {
+		document.querySelector(".help-modal").style.display = "inline-block";
+		infoShown = true;
+	}
+}
+
+document.querySelector(".apply-close").addEventListener("click", () => {
+   updateMethod = "onclose";
+   clearTimeout(updateChecker);
+   document.querySelector(".apply-close").classList.add("button-active");
+   document.querySelector(".apply-delay").classList.remove("button-active");
 });
+document.querySelector(".apply-delay").addEventListener("click", () => {
+   updateMethod = "delay";
+   document.querySelector(".apply-delay").classList.add("button-active");
+   document.querySelector(".apply-close").classList.remove("button-active");
+});
+
+document.querySelector(".save-button").addEventListener("click", () => {
+   if (!document.querySelector(".name-input").value) {
+      return;
+   }
+   profiles[document.querySelector(".name-input").value] = input.value;
+   localStorage.setItem("Roundabout_Playground_Saves", JSON.stringify(profiles));
+   document.querySelector(".name-input").value = "";
+   populateSaves();
+});
+
+document.querySelector(".load-button").addEventListener("click", () => {
+   input.value = JSON.parse(localStorage.getItem("Roundabout_Playground_Saves"))[document.querySelector(".profile-list").value];
+   toggleCode();
+   toggleSettings(false);
+   toggleHelp(false);
+   updated = false;
+   if (updateMethod == "delay") {
+      updateChecker = setTimeout(checkForUpdate, updateSpeed);
+   }
+});
+document.querySelector(".delete-button").addEventListener("click", () => {
+   delete profiles[document.querySelector(".profile-list").value];
+   localStorage.setItem("Roundabout_Playground_Saves", JSON.stringify(profiles));
+   populateSaves();
+});
+document.querySelector(".delay-input").addEventListener("input", () => {
+   updateSpeed = parseInt(document.querySelector(".delay-input").value);
+});
+
+function populateSaves() {
+   document.querySelector(".profile-list").innerHTML = null;
+   let allSaves = JSON.parse(localStorage.getItem("Roundabout_Playground_Saves"));
+   let hasDefault = false;
+   for (let key in allSaves) {
+      if (key.toString().toLowerCase() == "default") {
+         hasDefault = true;
+      }
+      profiles[key] = allSaves[key];
+      let newOption = document.createElement("option");
+      newOption.setAttribute("value", key.toString());
+      newOption.innerText = key.toString();
+      document.querySelector(".profile-list").appendChild(newOption);
+   }
+   if (!hasDefault) {
+      profiles.default = `new Roundabout({
+    
+});`;
+   }
+   localStorage.setItem("Roundabout_Playground_Saves", JSON.stringify(profiles));
+}
+
+populateSaves();
