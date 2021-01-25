@@ -3,11 +3,16 @@ const input = document.querySelector(".code");
 // Settings
 const autocomplete = [
 	["[", "]"],
-	["(", ")"],
+   ["(", ")"],
+   ["{", "}"],
 	[`"`, `"`],
 	["`", "`"],
-	["'", "'"],
-	["{", "}"],
+	["'", "'"]
+];
+const tabPairs = [
+   ["(", ")"],
+   ["{", "}"],
+   ["[", "]"]
 ];
 const tabSize = 4;
 let updateSpeed = 1000;
@@ -17,6 +22,17 @@ let updated = true;
 let updateChecker;
 let carousel;
 let codeShown = true;
+let lastWasPair = false;
+
+// TODO:
+/*
+-  Correct indentation
+   -  Detect how many pairs it's wrapped in
+-  Autocomplete
+   -  Simple box matching typing
+-  Auto update / update on code close
+-  Parse quotes in
+*/
 
 input.addEventListener("keydown", (e) => {
    clearTimeout(updateChecker);
@@ -26,48 +42,75 @@ input.addEventListener("keydown", (e) => {
    if (e.key == "Tab") {
       e.preventDefault();
       for (let a = 0; a < tabSize * tabs; a++) {
-         insertAtCursor(input, " ", false);
+         insertAtCursor(" ", false);
       }
       return;
    }
    if (e.key == "Enter") {
       setTimeout(() => {
          for (let a = 0; a < tabSize * tabs; a++) {
-            insertAtCursor(input, " ", false);
+            insertAtCursor(" ", false);
          }
       }, 0);
+      calcTabs();
+      lastWasPair = false;
       return;
    }
+   if (e.key == "Backspace") {
+      if (lastWasPair) {
+         e.preventDefault();
+         lastWasPair = false;
+         insertAtCursor("DELETE", false, -1);
+         insertAtCursor("DELETE", true, 0);
+      }
+   }
+   let wasPair = false;
 	autocomplete.forEach((pair) => {
 		if (e.key == pair[0] && !checkForChar(1)) {
 			e.preventDefault();
-			insertAtCursor(input, pair[0], false);
-         insertAtCursor(input, pair[1], true);
+			insertAtCursor(pair[0], false);
+         insertAtCursor(pair[1], true);
+         lastWasPair = true;
+         wasPair = true;
       }
-	});
+   });
+   console.log(wasPair);
+   if (!wasPair) {
+      lastWasPair = false;
+   }
 });
 
-function insertAtCursor(myField, myValue, isEnd) {
+function insertAtCursor(val, isEnd, side) {
 	//IE support
 	if (document.selection) {
-		myField.focus();
+		input.focus();
 		sel = document.selection.createRange();
-		sel.text = myValue;
+		sel.text = val;
 	}
 	//MOZILLA and others
-	else if (myField.selectionStart || myField.selectionStart == "0") {
-		var startPos = myField.selectionStart;
-		var endPos = myField.selectionEnd;
-		myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
-		if (isEnd) {
-			myField.selectionStart = startPos + myValue.length - 1;
-			myField.selectionEnd = startPos + myValue.length - 1;
-		} else {
-			myField.selectionStart = startPos + myValue.length;
-			myField.selectionEnd = startPos + myValue.length;
-		}
+	else if (input.selectionStart || input.selectionStart == "0") {
+		var startPos = input.selectionStart;
+      var endPos = input.selectionEnd;
+      if (val == "DELETE") {
+         input.value = input.value.substring(0, startPos+side) + input.value.substring(endPos+side+1, input.value.length);
+      } else {
+         input.value = input.value.substring(0, startPos) + val + input.value.substring(endPos, input.value.length);
+      }
+		if (isEnd && val != "DELETE") {
+			input.selectionStart = startPos + val.length - 1;
+			input.selectionEnd = startPos + val.length - 1;
+		} else if (val != "DELETE") {
+			input.selectionStart = startPos + val.length;
+			input.selectionEnd = startPos + val.length;
+      } else if (val == "DELETE" && !isEnd) {
+         input.selectionStart = startPos-1;
+         input.selectionEnd = startPos-1;
+      } else if (val == "DELETE" && isEnd) {
+         input.selectionStart = startPos;
+         input.selectionEnd = startPos;
+      }
 	} else {
-		myField.value += myValue;
+		input.value += val;
 	}
 }
 
@@ -103,6 +146,22 @@ function checkForUpdate() {
       carousel = new Roundabout(settings);
       updated = true;
    }
+}
+
+function calcTabs() {
+   let chars = input.value.slice(0, input.selectionStart).split("");
+   let pairs = 0;
+   chars.forEach((codeChar) => {
+      tabPairs.forEach((tabChar) => {
+         if (codeChar == tabChar[0]) {
+            pairs++;
+         }
+         if (codeChar == tabChar[1]) {
+            pairs--;
+         }
+      });
+   });
+   tabs = pairs - 1;
 }
 
 updateChecker = setTimeout(checkForUpdate, updateSpeed);
