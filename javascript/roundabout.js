@@ -93,6 +93,7 @@ let roundabout = {
 	usedIds: []
 };
 
+//! UPDATING SETTING NAMES
 class Roundabout {
 	constructor(settings) {
 		this.pages = settings.pages ? settings.pages : {};
@@ -102,28 +103,28 @@ class Roundabout {
 		this.parent = settings.parent ? settings.parent : "body";
 		this.autoGenCSS = settings.autoGenCSS === false ? settings.autoGenCSS : true;
       this.navigation = settings.navigation === false ? settings.navigation : true;
-      this.navigation_behavior = (settings.navigation_behavior && this.infinite) ? settings.navigation_behavior : "direction";
-		this.autoScroll = settings.autoScroll ? settings.autoScroll : false;
-		this.autoScroll_speed = settings.autoScroll_speed >= 0 ? settings.autoScroll_speed : 5000;
-		this.autoScroll_timeout = settings.autoScroll_timeout >= 0 ? settings.autoScroll_timeout : 15000;
-		this.autoScroll_pauseOnHover = settings.autoScroll_pauseOnHover ? settings.autoScroll_pauseOnHover : false;
-		this.autoScroll_startAfter = settings.autoScroll_startAfter >= 0 ? settings.autoScroll_startAfter : 5000;
-		this.autoScroll_direction = settings.autoScroll_direction ? settings.autoScroll_direction : "right";
+      this.navigationBehavior = (settings.navigationBehavior && this.infinite) ? settings.navigationBehavior : "direction";
+		this.autoscroll = settings.autoscroll ? settings.autoscroll : false;
+		this.autoscrollSpeed = settings.autoscrollSpeed >= 0 ? settings.autoscrollSpeed : 5000;
+		this.autoscrollTimeout = settings.autoscrollTimeout >= 0 ? settings.autoscrollTimeout : 15000;
+		this.autoscrollPauseOnHover = settings.autoscrollPauseOnHover ? settings.autoscrollPauseOnHover : false;
+		this.autoscrollStartAfter = settings.autoscrollStartAfter >= 0 ? settings.autoscrollStartAfter : 5000;
+		this.autoscrollDirection = settings.autoscrollDirection ? settings.autoscrollDirection : "right";
 		this.transition = settings.transition >= 0 ? settings.transition : 300;
-		this.transition_timingFunction = settings.transition_timingFunction ? settings.transition_timingFunction : "ease";
+		this.transitionFunction = settings.transitionFunction ? settings.transitionFunction : "ease";
 		this.throttle = settings.throttle === false ? settings.throttle : true;
-		this.throttle_timeout = settings.throttle_timeout >= 0 ? settings.throttle_timeout : 300;
-		this.throttle_matchTransition = settings.throttle_matchTransition ? settings.throttle_matchTransition : true;
-		this.throttle_keys = settings.throttle_keys === false ? settings.throttle_keys : true;
-		this.throttle_swipe = settings.throttle_swipe === false ? settings.throttle_swipe : true;
-		this.throttle_buttons = settings.throttle_buttons === false ? settings.throttle_buttons : true;
-      this.throttle_navigation = settings.throttle_navigation === false ? settings.throttle_navigation : true;
+		this.throttleTimeout = settings.throttleTimeout >= 0 ? settings.throttleTimeout : 300;
+		this.throttleMatchTransition = settings.throttleMatchTransition ? settings.throttleMatchTransition : true;
+		this.throttleKeys = settings.throttleKeys === false ? settings.throttleKeys : true;
+		this.throttleSwipe = settings.throttleSwipe === false ? settings.throttleSwipe : true;
+		this.throttleButtons = settings.throttleButtons === false ? settings.throttleButtons : true;
+      this.throttleNavigation = settings.throttleNavigation === false ? settings.throttleNavigation : true;
       
 		this.keys = settings.keys === false ? settings.keys : true;
 		this.swipe = settings.swipe === false ? settings.swipe : true;
-		this.swipe_threshold = settings.swipe_threshold >= 0 ? settings.swipe_threshold : 300;
-		this.swipe_multiplier = settings.swipe_multiplier ? settings.swipe_multiplier : 1;
-		this.swipe_resistance = settings.swipe_resistance >= 0 ? settings.swipe_resistance : 0.95;
+		this.swipeThreshold = settings.swipeThreshold >= 0 ? settings.swipeThreshold : 300;
+		this.swipeMultiplier = settings.swipeMultiplier ? settings.swipeMultiplier : 1;
+		this.swipeResistance = settings.swipeResistance >= 0 ? settings.swipeResistance : 0.95;
 
 		this.pagesToShow = settings.pagesToShow ? settings.pagesToShow : 1;
 		this.enlargeCenter = settings.enlargeCenter ? settings.enlargeCenter : 100;
@@ -140,8 +141,8 @@ class Roundabout {
 		// this.offsetOut = (settings.offsetOut) ? settings.offsetOut : -20;
 		// this.offsetUnits = (settings.offsetUnits) ? settings.offsetUnits : "px";
 
-		this.mobile = settings.mobile ? settings.mobile : {swipe_threshold: 50};
-		this.mobile_breakpoint = settings.mobile_breakpoint ? settings.mobile_breakpoint : 700;
+		this.mobile = settings.mobile ? settings.mobile : {swipeThreshold: 50};
+		this.mobileBreakpoint = settings.mobileBreakpoint ? settings.mobileBreakpoint : 700;
 		this.visualPreset = settings.visualPreset ? settings.visualPreset : 0;
 
 		// this.val = settings.val ? settings.val : default;
@@ -194,6 +195,7 @@ class Roundabout {
    ==================================================================================================================
    
    SCROLLING
+
    ==================================================================================================================
    */
 
@@ -332,15 +334,15 @@ class Roundabout {
    }
 
    scrollTo(page) {
-      if (!this.infinite || this.navigation_behavior == "direction") {
+      if (!this.infinite || this.navigationBehavior == "direction") {
          if (page < this.onPage) {
-            if (this.throttle_navigation) {
+            if (this.throttleNavigation) {
                this.previousHandler(this, "scrollto", page - this.onPage);
             } else {
                this.scrollPrevious(page - this.onPage);
             }            
          } else {
-            if (this.throttle_navigation) {
+            if (this.throttleNavigation) {
                this.nextHandler(this, "scrollto", page - this.onPage);
             } else {
                this.scrollNext(page - this.onPage);
@@ -348,13 +350,13 @@ class Roundabout {
          }
       } else {
          if (this.findOffset(this.onPage, page, "p") < this.findOffset(this.onPage, page, "n")) {
-            if (this.throttle_navigation) {
+            if (this.throttleNavigation) {
                this.previousHandler(this, "scrollto", -1*this.findOffset(this.onPage, page, "p"));
             } else {
                this.scrollPrevious(-1*this.findOffset(this.onPage, page, "p"));
             }
          } else {
-            if (this.throttle_navigation) {
+            if (this.throttleNavigation) {
                this.nextHandler(this, "scrollto", this.findOffset(this.onPage, page, "n"));
             } else {
                this.scrollNext(this.findOffset(this.onPage, page, "n"));
@@ -376,11 +378,11 @@ class Roundabout {
 		parent.resetScrollTimeout();
 		if (parent.scrollIsAllowed && !parent.dragging) {
 			parent.scrollNext(sd, false, sb);
-			if ((parent.throttle && parent.throttle_buttons && from != "key") || (parent.throttle && parent.throttle_keys && from == "key")) {
+			if ((parent.throttle && parent.throttleButtons && from != "key") || (parent.throttle && parent.throttleKeys && from == "key")) {
 				parent.scrollIsAllowed = false;
 				setTimeout(() => {
 					parent.scrollIsAllowed = true;
-				}, parent.throttle_timeout);
+				}, parent.throttleTimeout);
 			}
 		}
 	}
@@ -398,11 +400,11 @@ class Roundabout {
 		parent.resetScrollTimeout();
 		if (parent.scrollIsAllowed && !parent.dragging) {
 			parent.scrollPrevious(sd, false, sb);
-			if ((parent.throttle && parent.throttle_buttons && from != "key") || (parent.throttle && parent.throttle_keys && from == "key")) {
+			if ((parent.throttle && parent.throttleButtons && from != "key") || (parent.throttle && parent.throttleKeys && from == "key")) {
 				parent.scrollIsAllowed = false;
 				setTimeout(() => {
 					parent.scrollIsAllowed = true;
-				}, parent.throttle_timeout);
+				}, parent.throttleTimeout);
 			}
 		}
 	}
@@ -411,6 +413,7 @@ class Roundabout {
    ==================================================================================================================
    
    AUTOSCROLL
+
    ==================================================================================================================
    */
 
@@ -420,37 +423,39 @@ class Roundabout {
 		clearInterval(this.scrollIntervalHolder);
 		this.scrollTimeoutHolder = setTimeout(() => {
 			this.setAutoScroll(this);
-		}, this.autoScroll_timeout);
+		}, this.autoscrollTimeout);
 	}
 
 	// Initializes autoscroll if enabled
 	setAutoScroll(parent, firstTime = false) {
-		if (firstTime && parent.autoScroll) {
+		if (firstTime && parent.autoscroll) {
 			setTimeout(() => {
 				parent.scrollAuto(parent);
 				parent.scrollIntervalHolder = setInterval(() => {
 					parent.scrollAuto(parent);
-				}, parent.autoScroll_speed);
-			}, parent.autoScroll_startAfter);
-		} else if (parent.autoScroll) {
+				}, parent.autoscrollSpeed);
+			}, parent.autoscrollStartAfter);
+		} else if (parent.autoscroll) {
 			parent.scrollIntervalHolder = setInterval(() => {
 				parent.scrollAuto(parent);
-			}, parent.autoScroll_speed);
+			}, parent.autoscrollSpeed);
 		}
 	}
 
 	// Called at each interval, determines how to scroll
 	scrollAuto(parent) {
-		if (parent.autoScroll_direction.toLowerCase() == "left" && parent.scrollIsAllowed) {
+		if (parent.autoscrollDirection.toLowerCase() == "left" && parent.scrollIsAllowed) {
 			parent.scrollPrevious(this.scrollBy);
-		} else if (parent.autoScroll_direction.toLowerCase() == "right" && parent.scrollIsAllowed) {
+		} else if (parent.autoscrollDirection.toLowerCase() == "right" && parent.scrollIsAllowed) {
 			parent.scrollNext(this.scrollBy);
 		}
 	}
 
 	/*
    ==================================================================================================================
+
    SWIPING
+
    ==================================================================================================================
    */
 
@@ -465,7 +470,7 @@ class Roundabout {
 	tStart(event, parent) {
 		// throttling
 		parent.resetScrollTimeout();
-		if (parent.throttle_swipe) {
+		if (parent.throttleSwipe) {
 			if (parent.swipeIsAllowed) {
 				if (parent.throttle) {
 					parent.swipeIsAllowed = false;
@@ -520,29 +525,29 @@ class Roundabout {
 				parent.y = event.clientY;
 			}
 
-			parent.dx = (parent.x - parent.sx) * parent.swipe_multiplier;
+			parent.dx = (parent.x - parent.sx) * parent.swipeMultiplier;
 
 			// resistant scrolling
 			if (Math.abs(parent.dx) < document.querySelector(parent.parent).offsetWidth && parent.infinite) {
-				parent.dx = (parent.x - parent.sx) * parent.swipe_multiplier;
+				parent.dx = (parent.x - parent.sx) * parent.swipeMultiplier;
 			} else if (parent.dx < 0) {
 				if (parent.infinite) {
-					parent.dx -= (parent.dx + document.querySelector(parent.parent).offsetWidth) * parent.swipe_resistance;
+					parent.dx -= (parent.dx + document.querySelector(parent.parent).offsetWidth) * parent.swipeResistance;
 				} else if (parent.pages.length - parent.pagesToShow == parent.onPage) {
-					if (parent.swipe_resistance == 1) {
+					if (parent.swipeResistance == 1) {
 						parent.dx = 0;
 					} else {
-						parent.dx -= parent.dx * parent.swipe_resistance;
+						parent.dx -= parent.dx * parent.swipeResistance;
 					}
 				}
 			} else if (parent.dx > 0) {
 				if (parent.infinite) {
-					parent.dx -= (parent.dx - document.querySelector(parent.parent).offsetWidth) * parent.swipe_resistance;
+					parent.dx -= (parent.dx - document.querySelector(parent.parent).offsetWidth) * parent.swipeResistance;
 				} else if (parent.orderedPages[parent.orderedPagesMainIndex] === 0) {
-					if (parent.swipe_resistance == 1) {
+					if (parent.swipeResistance == 1) {
 						parent.dx = 0;
 					} else {
-						parent.dx -= parent.dx * parent.swipe_resistance;
+						parent.dx -= parent.dx * parent.swipeResistance;
 					}
 				}
 			}
@@ -551,8 +556,8 @@ class Roundabout {
 			let dist = Math.abs(parent.dx);
 
 			if (
-				(dist >= parent.swipe_threshold && parent.infinite) ||
-				(dist >= parent.swipe_threshold &&
+				(dist >= parent.swipeThreshold && parent.infinite) ||
+				(dist >= parent.swipeThreshold &&
 					!parent.infinite &&
 					parent.onPage >= 0 &&
 					parent.onPage < parent.pages.length - parent.pagesToShow)
@@ -586,7 +591,7 @@ class Roundabout {
 	tEnd(event, parent) {
 		setTimeout(() => {
 			parent.swipeIsAllowed = true;
-		}, parent.throttle_timeout);
+		}, parent.throttleTimeout);
 
 		document.querySelector(`.roundabout-${parent.uniqueId}-page-wrap`).classList.add(`roundabout-${this.uniqueId}-has-transition`);
 		document.querySelector(`.roundabout-${parent.uniqueId}-page-wrap`).classList.remove(`roundabout-has-no-transition`);
@@ -686,6 +691,7 @@ class Roundabout {
    ==================================================================================================================
    
    DEFAULT FUNCTIONS
+
    ==================================================================================================================
    */
 
@@ -746,12 +752,12 @@ class Roundabout {
 	internalCSS() {
 		let css = `.roundabout-${this.uniqueId}-has-transition {
          transition:${this.transition / 1000}s; 
-         transition-timing-function:${this.transition_timingFunction}} 
+         transition-timing-function:${this.transitionFunction}} 
          .roundabout-has-no-transition{
             transition:none;} 
          .roundabout-hidden-page {
             visibility: hidden}
-         .carousel-error-message {
+         .roundabout-error-message {
             position:relative;
             margin:auto;
             left:0;
@@ -772,6 +778,7 @@ class Roundabout {
 
 	/*
    ==================================================================================================================
+
    GENERAL FUNCTIONS
    
    ==================================================================================================================
@@ -893,7 +900,7 @@ class Roundabout {
 				settingsL++;
 			}
 		}
-		if (screen.width <= this.mobile_breakpoint) {
+		if (screen.width <= this.mobileBreakpoint) {
 			let c = Object.entries(this);
 			let cm = Object.entries(this.mobile);
 			for (let a = 0; a < mobileL; a++) {
@@ -919,10 +926,10 @@ class Roundabout {
 			if (this.autoGenCSS && this.allowInternalStyles) {
 				this.defaultCSS();
 			}
-			if (this.throttle_matchTransition) {
-				this.throttle_timeout = this.transition;
+			if (this.throttleMatchTransition) {
+				this.throttleTimeout = this.transition;
 			}
-			if (this.autoScroll) {
+			if (this.autoscroll) {
 				this.setAutoScroll(this, true);
 			}
 			this.generatePages();
@@ -930,7 +937,7 @@ class Roundabout {
 			this.boundEnd = this.execMU.bind(this);
 			this.boundCancel = this.execTC.bind(this);
 			if (this.type == "normal") {
-				this.swipe_threshold /= this.pagesToShow;
+				this.swipeThreshold /= this.pagesToShow;
 			}
 		}
 	}
@@ -955,7 +962,7 @@ class Roundabout {
 				}
 			});
 		}
-		if (this.autoScroll_pauseOnHover) {
+		if (this.autoscrollPauseOnHover) {
 			document.querySelector(this.parent).addEventListener("mouseover", () => {
 				this.scrollIsAllowed = false;
 			});
@@ -1012,6 +1019,7 @@ class Roundabout {
 
 	/*
    ==================================================================================================================
+
    UTILITY
    
    ==================================================================================================================
@@ -1101,6 +1109,7 @@ class Roundabout {
 
 	/*
    ==================================================================================================================
+
    OTHER
    
    ==================================================================================================================
@@ -1109,7 +1118,7 @@ class Roundabout {
 	// creates error message box
 	displayError(message, title = "Error:") {
 		let em = document.createElement("DIV");
-		em.classList.add("carousel-error-message");
+		em.classList.add("roundabout-error-message");
 		let t = document.createElement("SPAN");
 		t.innerHTML = title;
 		t.style.color = "red";
