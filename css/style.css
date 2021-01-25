@@ -3,7 +3,7 @@
 @mixin name - function (used @include name(param))
 $name - variable
 */
-.autocomplete .auto-hint {
+.autocomplete .auto-hint, .tools div svg {
   position: absolute;
   left: 0;
   right: 0;
@@ -36,7 +36,6 @@ body {
   border-top-left-radius: 5px;
   background: #232323;
   border: none;
-  box-shadow: 0px 0px 10px #333;
   padding: 10px;
   box-sizing: border-box;
   color: #eee;
@@ -48,6 +47,7 @@ body {
   height: 85%;
   bottom: 50px;
   z-index: 99999;
+  box-shadow: 0px 0px 10px #333;
 }
 
 .code-toggle {
@@ -113,4 +113,24 @@ body {
   padding-bottom: 5px;
   box-sizing: border-box;
   font-family: monospace;
+}
+
+.tools {
+  position: fixed;
+  right: 5px;
+  bottom: 5px;
+}
+.tools div {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  background: #111;
+  border-radius: 5px;
+  position: relative;
+  cursor: pointer;
+}
+.tools div svg {
+  color: white;
+  height: 20px;
+  width: 20px;
 }

@@ -196,7 +196,7 @@ function checkForChar(position, value) {
 function checkForUpdate() {
 	if (!updated) {
 		carousel = null;
-		let rawSettings = input.value.trim().substring(15, input.value.trim().length - 2);
+		// let rawSettings = input.value.trim().substring(15, input.value.trim().length - 2);
 		let settings;
 		try {
 			settings = JSON.parse(input.value.trim().substring(15, input.value.trim().length - 2));
@@ -208,8 +208,8 @@ function checkForUpdate() {
 		if (document.querySelector(destroy)) {
 			document.querySelector(destroy).remove();
 		}
-		if (document.querySelector(".carousel-error-message")) {
-			document.querySelector(".carousel-error-message").remove();
+		if (document.querySelector(".roundabout-error-message")) {
+			document.querySelector(".roundabout-error-message").remove();
 		}
 		roundabout.usedIds = [];
 		roundabout.on = -1;
@@ -236,9 +236,6 @@ function calcTabs(correction = 0) {
 }
 
 function checkAutocomplete(key) {
-   if (typing.length == 0) {
-      document.querySelector(".auto-hint").style.opacity = "1";
-   }
    if (key == "BACKSPACE") {
       typing = typing.substr(0, typing.length - 1);
    } else {
@@ -248,12 +245,7 @@ function checkAutocomplete(key) {
 	let matches = [];
 	document.querySelector(".autocomplete").innerHTML = null;
 	autoSettings.forEach((setting) => {
-		// console.log(`checking ${setting[0]}`);
-		// console.log(setting);
-		// console.log(matcher);
-		// console.log(setting[0].match(matcher));
 		if (setting[0].match(matcher) && setting[0].substr(0, 2) != "--") {
-			// console.log(`${setting[0]} matches`);
 			matches.push(setting);
 			if (document.querySelector(".auto-hint")) {
 				document.querySelector(".auto-hint").style.opacity = "0";
@@ -263,7 +255,14 @@ function checkAutocomplete(key) {
 			autoHint.innerHTML = `<div>${setting[0]}</div><div>${setting[1]}</div><div>${setting[2]}</div>`;
 			document.querySelector(".autocomplete").appendChild(autoHint);
 		}
-	});
+   });
+   if (typing.length == 0) {
+	   document.querySelector(".autocomplete").innerHTML = null;
+      let autoHintRestore = document.createElement("div");
+      autoHintRestore.classList.add("auto-hint");
+      autoHintRestore.innerText = "Start typing above. Any matching settings will appear here.";
+      document.querySelector(".autocomplete").appendChild(autoHintRestore);
+   }
 }
 
 updateChecker = setTimeout(checkForUpdate, updateSpeed);
