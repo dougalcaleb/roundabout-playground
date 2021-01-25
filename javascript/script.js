@@ -279,7 +279,7 @@ function checkAutocomplete(key) {
 
 updateChecker = setTimeout(checkForUpdate, updateSpeed);
 
-let codeShown = false;
+let codeShown = true;
 let settingsShown = false;
 let infoShown = false;
 document.querySelector(".code-toggle").addEventListener("click", () => {

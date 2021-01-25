@@ -48,7 +48,6 @@ body {
   bottom: 50px;
   z-index: 99999;
   box-shadow: 0px 0px 10px #333;
-  display: none;
 }
 
 .code-toggle {
@@ -150,11 +149,12 @@ body {
   font-weight: 400;
   font-size: 12px;
   z-index: 999;
+  display: none;
+  color: white;
 }
 .settings-modal .setting {
   width: 100%;
   margin-bottom: 5px;
-  color: white;
   position: relative;
 }
 .settings-modal .setting-flex {
@@ -191,4 +191,32 @@ body {
 
 .button-active {
   border: 2px solid #00f3ff;
+}
+
+.help-modal {
+  height: 30%;
+  width: 30%;
+  position: fixed;
+  right: 5px;
+  bottom: 45px;
+  background: #1d1d1d;
+  border-radius: 5px;
+  padding: 5px;
+  box-sizing: border-box;
+  font-family: "Roboto Mono", monospace;
+  font-weight: 400;
+  font-size: 12px;
+  z-index: 999;
+  color: white;
+  display: none;
+}
+.help-modal .parent-ul {
+  margin-left: -30px;
+}
+.help-modal li {
+  list-style-type: none;
+  left: -40px;
+}
+.help-modal a {
+  color: #ddd;
 }

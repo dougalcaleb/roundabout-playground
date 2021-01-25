@@ -29,7 +29,7 @@ body {
    z-index: 99999;
    box-shadow: 0px 0px 10px #333;
 
-   display: none;
+   // display: none;
 }
 
 .code-toggle {
@@ -135,10 +135,11 @@ body {
    font-weight: 400;
    font-size: 12px;
    z-index: 999;
+   display: none;
+   color: white;
    .setting {
       width: 100%;
       margin-bottom: 5px;
-      color: white;
       position: relative;
    }
    .setting-flex {
@@ -179,4 +180,34 @@ body {
    border: 2px solid #00f3ff;
    // box-sizing: border-box;
 
+}
+
+
+.help-modal {
+   height: 30%;
+   width: 30%;
+   position: fixed;
+   right: 5px;
+   bottom: 45px;
+   background: #1d1d1d;
+   border-radius: 5px;
+   padding: 5px;
+   box-sizing: border-box;
+   font-family: "Roboto Mono", monospace;
+   font-weight: 400;
+   font-size: 12px;
+   z-index: 999;
+   color: white;
+   display: none;
+   .parent-ul {
+      margin-left: -30px;
+   }
+   li {
+      list-style-type: none;
+      // margin-left: 0px;
+      left: -40px;
+   }
+   a {
+      color: #ddd;
+   }
 }
