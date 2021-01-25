@@ -71,11 +71,6 @@ let typing = "";
 let matcher;
 let profiles = {};
 
-// TODO:
-/*
--  Auto update / update on code close
--  Parse quotes in
-*/
 
 input.addEventListener("keydown", (e) => {
    if (updateMethod == "delay") {
@@ -224,6 +219,7 @@ function checkForUpdate() {
          carousel = new Roundabout(settings);
          console.log("Render was successful.");
       } catch (e) {
+         document.querySelector(".code-toggle").style.color = "#fff700";
          console.error(e);
       }
 		updated = true;
